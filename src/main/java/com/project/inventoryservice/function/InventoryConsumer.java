@@ -7,6 +7,7 @@ import com.project.inventoryservice.model.Product;
 import com.project.inventoryservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Optional;
@@ -24,6 +25,7 @@ public class InventoryConsumer {
         this.streamBridge = streamBridge;
     }
 
+    @Bean
     public Consumer<OrderCreatedEvent> processOrder() {
         return event -> {
             log.info("Processing order id: {}", event.orderId());
