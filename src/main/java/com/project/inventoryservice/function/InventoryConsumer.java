@@ -1,8 +1,6 @@
 package com.project.inventoryservice.function;
 
-import com.project.inventoryservice.dto.OrderCreatedEvent;
-import com.project.inventoryservice.dto.StockRejectedEvent;
-import com.project.inventoryservice.dto.StockReservedEvent;
+import com.project.inventoryservice.dto.*;
 import com.project.inventoryservice.model.Product;
 import com.project.inventoryservice.repository.ProductRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +54,23 @@ public class InventoryConsumer {
                 streamBridge.send("stockRejected-out-0",
                         new StockRejectedEvent(event.orderId(), event.productId(), "Product does not exist"));
             }
+        };
+    }
+
+    @Bean
+    public Consumer<OrderCancelledEvent> restoreStock() {
+        return event -> {
+            log.info("Restoring stock for cancelled order: {}", event.orderId());
+
+            productRepository.findById(event.productId()).ifPresent(product -> {
+               product.setStock(product.getStock() + event.quantity());
+
+               productRepository.save(product);
+               log.info("Stock restored for product: {}", event.productId());
+
+               streamBridge.send("stockRestored-out-0",
+                       new StockRestoredEvent(event.orderId(), event.productId(), event.quantity()));
+            });
         };
     }
 }
