@@ -28,7 +28,7 @@ public class InventoryConsumer {
         return event -> {
             log.info("Processing order id: {}", event.orderId());
 
-            Optional<Product> productOpt = productRepository.findById(event.productId());
+            Optional<Product> productOpt = productRepository.findBySku(event.sku());
 
             if (productOpt.isPresent()) {
                 Product product = productOpt.get();
@@ -38,21 +38,21 @@ public class InventoryConsumer {
 
                     productRepository.save(product);
 
-                    log.info("Stock reserved for: {}", event.productId());
+                    log.info("Stock reserved for: {}", event.sku());
 
                     streamBridge.send("stockReserved-out-0",
-                            new StockReservedEvent(event.orderId(), event.productId(), event.quantity()));
+                            new StockReservedEvent(event.orderId(), event.sku(), event.quantity()));
                 } else {
-                    log.warn("Insufficient stock for: {}", event.productId());
+                    log.warn("Insufficient stock for: {}", event.sku());
 
                     streamBridge.send("stockRejected-out-0",
-                            new StockRejectedEvent(event.orderId(), event.productId(), "Insufficient stock"));
+                            new StockRejectedEvent(event.orderId(), event.sku(), "Insufficient stock"));
                 }
             } else {
-                log.warn("Product not found for: {}", event.productId());
+                log.warn("Product not found for: {}", event.sku());
 
                 streamBridge.send("stockRejected-out-0",
-                        new StockRejectedEvent(event.orderId(), event.productId(), "Product does not exist"));
+                        new StockRejectedEvent(event.orderId(), event.sku(), "Product does not exist"));
             }
         };
     }
@@ -62,14 +62,14 @@ public class InventoryConsumer {
         return event -> {
             log.info("Restoring stock for cancelled order: {}", event.orderId());
 
-            productRepository.findById(event.productId()).ifPresent(product -> {
+            productRepository.findBySku(event.sku()).ifPresent(product -> {
                product.setStock(product.getStock() + event.quantity());
 
                productRepository.save(product);
-               log.info("Stock restored for product: {}", event.productId());
+               log.info("Stock restored for product: {}", event.sku());
 
                streamBridge.send("stockRestored-out-0",
-                       new StockRestoredEvent(event.orderId(), event.productId(), event.quantity()));
+                       new StockRestoredEvent(event.orderId(), event.sku(), event.quantity()));
             });
         };
     }
