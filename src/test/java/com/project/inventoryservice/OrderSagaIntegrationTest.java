@@ -79,7 +79,7 @@ class OrderSagaIntegrationTest {
     @Test
     void whenCreatedEventIsSent_ThenStockIsDecremented() throws Exception {
         Product product = new Product();
-        product.setId("SAGA-TEST-001");
+        product.setSku("SAGA-TEST-001");
         product.setStock(10);
 
         productRepository.save(product);
@@ -106,7 +106,7 @@ class OrderSagaIntegrationTest {
                 .atMost(10, TimeUnit.SECONDS)
                 .pollInterval(Duration.ofMillis(500))
                 .untilAsserted(() -> {
-                   Product updatedProduct = productRepository.findById("SAGA-TEST-001").orElseThrow();
+                   Product updatedProduct = productRepository.findBySku("SAGA-TEST-001").orElseThrow();
 
                    Assertions.assertEquals(
                            8,

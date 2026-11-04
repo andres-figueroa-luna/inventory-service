@@ -28,15 +28,15 @@ class InventoryConsumerIntegrationTest {
     @Test
     void whenOrderCreated_ThenStockIsDecremented() {
         Product product = new Product();
-        product.setId("TEST-INTEGRATION");
+        product.setSku("TEST-INTEGRATION");
         product.setStock(10);
         productRepository.save(product);
 
-        Product productToUpdate = productRepository.findById("TEST-INTEGRATION").orElseThrow();
+        Product productToUpdate = productRepository.findBySku("TEST-INTEGRATION").orElseThrow();
         productToUpdate.setStock(productToUpdate.getStock() - 2);
         productRepository.save(productToUpdate);
 
-        Product updatedProduct = productRepository.findById("TEST-INTEGRATION").orElseThrow();
+        Product updatedProduct = productRepository.findBySku("TEST-INTEGRATION").orElseThrow();
         Assertions.assertEquals(8, updatedProduct.getStock());
     }
 }
