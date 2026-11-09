@@ -4,6 +4,8 @@ import com.project.inventoryservice.dto.*;
 import com.project.inventoryservice.model.Product;
 import com.project.inventoryservice.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +36,8 @@ public class ProductController {
     @Operation(summary = "Get product by ID")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Product found"),
-            @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable Long id) {
@@ -51,7 +54,8 @@ public class ProductController {
     @Operation(summary = "Update product stock", description = "Sets a new stock value for a specific product.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Stock updated successfully"),
-            @ApiResponse(responseCode = "404", description = "Product not found")
+            @ApiResponse(responseCode = "404", description = "Product not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{id}/stock")
     public ResponseEntity<ProductUpdatedResponse> updateStock(@PathVariable Long id,
