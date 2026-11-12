@@ -1,5 +1,6 @@
 package com.project.inventoryservice;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.inventoryservice.dto.OrderCreatedEvent;
 import com.project.inventoryservice.model.Product;
 import com.project.inventoryservice.repository.ProductRepository;
@@ -20,12 +21,11 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.kafka.KafkaContainer;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -46,7 +46,7 @@ class OrderSagaIntegrationTest {
 
     @Container
     static KafkaContainer kafka = new KafkaContainer(
-            DockerImageName.parse("apache/kafka:latest"));
+            DockerImageName.parse("apache/kafka:4.3.0"));
 
     @DynamicPropertySource
     static void overrideProperties(DynamicPropertyRegistry registry) {
